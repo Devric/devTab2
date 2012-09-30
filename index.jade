@@ -1,0 +1,93 @@
+!!!5
+html
+    head
+        title devTab
+        script(src="jquery.js")
+        script(src="devTab.js")
+        script
+
+        style
+            .dtab {
+                width: 300px;
+                margin-bottom: 50px;
+            }
+
+
+    body
+
+        #none.dtab
+            .tabs
+                .title title two
+                .content this is just some short one
+            .tabs
+                .title title two tab 2
+                .content waaaa
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+
+
+        #set.dtab(data-width="130", data-fx="slideX")
+            .tabs
+                .title title one
+                .content this is just some long texts, nothing special
+                        | with some joints texts, nothing special
+                        | with some joints texts, nothing special
+                        | with some joints texts, nothing special
+                        | with some joints texts, nothing special
+                        | with some joints texts, nothing special
+                        | with some joints texts, nothing special
+                        | ontent this is just some lon
+                        | with some joints
+            .tabs
+                .title title blah
+                .content this is just some thing
+
+            .tabs
+                .title title again
+                .content this is just some thing
+                    | nothing really new
+                    | nothing really new
+                    | nothing really new
+
+
+        section(style="margin:10px; border: 2px solid #ddd")
+            #fadeNlock.dtab(data-fx="fade", data-lock="true")
+                .tabs
+                    .title title two
+                    .content this is just some short one
+                .tabs
+                    .title title two tab 2
+                    .content waaaa
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+
+            #fade.dtab(data-fx="fade")
+                .tabs
+                    .title title two
+                    .content this is just some short one
+                .tabs
+                    .title title two tab 2
+                    .content waaaa
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
+                        | nothing really new
