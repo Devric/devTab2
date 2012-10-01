@@ -158,6 +158,12 @@ if (window.dCache === void 0) {
     */
 
 
+    dTab.prototype.utility = {
+      findDiff: function() {
+        return console.log('find diff');
+      }
+    };
+
     return dTab;
 
   })();

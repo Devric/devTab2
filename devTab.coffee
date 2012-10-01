@@ -135,6 +135,7 @@ window.dCache = {} if window.dCache == undefined
 
     ### FX
     ================= ###
+    # @todo: refactor this function to just object literal
     fx: (fx) ->
       # save @obj instance
       obj = @
@@ -175,6 +176,9 @@ window.dCache = {} if window.dCache == undefined
 
     ### utility
     ================= ###
+    utility:
+      findDiff: ->
+        console.log 'find diff'
 
 
   ### == Exports ============= ###
@@ -230,7 +234,7 @@ window.dCache = {} if window.dCache == undefined
             inSpeed: if !D.opts.inSpeed then D.opts.speed
             outSpeed: if !D.opts.outSpeed then D.opts.speed
         }
-            
+
 
       # history
 
