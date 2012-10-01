@@ -33,13 +33,6 @@ if (window.dCache === void 0) {
       this.title = this.tabs.find('.title');
       this.width = this.tabs.outerWidth(true);
       this.height = this.tabs.outerHeight(true);
-      /* Trigger
-      */
-
-      $($(el)).on('click', '.nav li', function() {
-        console.log($(this).closest($(el)));
-        return console.log($(this).index());
-      });
     }
 
     dTab.prototype.log = function(msg) {
@@ -56,7 +49,11 @@ if (window.dCache === void 0) {
     dTab.prototype.defaults = {
       debug: false,
       fx: 'none',
-      'lock': false
+      'lock': false,
+      timer: false,
+      inSpeed: false,
+      outSpeed: false,
+      speed: 'slow'
     };
 
     /* initiator
@@ -127,16 +124,29 @@ if (window.dCache === void 0) {
       }
       effects = {
         none: function() {
-          return console.log('default');
+          return obj.el.on('paging', function(evt, param) {
+            obj.el.find('.tab').hide();
+            return obj.el.find('.tab').eq(param['i']).show();
+          });
         },
         fade: function() {
-          return console.log('fade');
+          return obj.el.on('paging', function(evt, param) {
+            return obj.el.find('.tab').fadeOut(param['outSpeed']).promise().done(function() {
+              return obj.el.find('.tab').eq(param['i']).fadeIn(param['inSpeed']);
+            });
+          });
         },
         slideX: function() {
-          return console.log('slideX');
+          return obj.el.on('paging', function(evt, param) {
+            console.log(param);
+            return console.log('slideX');
+          });
         },
         slideY: function() {
-          return console.log('slideY');
+          return obj.el.on('paging', function(evt, param) {
+            console.log(param);
+            return console.log('slideY');
+          });
         }
       };
       return effects[fx]();
@@ -170,9 +180,11 @@ if (window.dCache === void 0) {
 
   return $.fn[pluginName] = function(options) {
     return this.each(function() {
-      var D;
+      var D, self;
+      self = $(this);
       D = new dCache['dTab'](this, options);
       D.init();
+      D.log(D.opts);
       /* build it
       */
 
@@ -189,7 +201,20 @@ if (window.dCache === void 0) {
       } else {
         D.fx();
       }
-      return D.log(D.opts);
+      /* Trigger
+      */
+
+      return self.on('click', '.nav li', function() {
+        if ($(this).hasClass('active')) {
+          return false;
+        }
+        $(this).addClass('active').siblings().removeClass('active');
+        return self.trigger('paging', {
+          i: $(this).index(),
+          inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
+          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0
+        });
+      });
     });
   };
 })(jQuery, window);
@@ -206,7 +231,6 @@ if (window.dCache === void 0) {
 
 $(function() {
   return $('.dtab').devTab({
-    test: 'something',
     debug: true
   });
 });

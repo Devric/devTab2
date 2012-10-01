@@ -24,11 +24,6 @@ window.dCache = {} if window.dCache == undefined
       @title  = @tabs.find('.title')
       @width  = @tabs.outerWidth(true)
       @height = @tabs.outerHeight(true)
-
-      ### Trigger ###
-      $($(el)).on 'click', '.nav li', ->
-        console.log $(@).closest($(el))
-        console.log $(@).index()
       
 
     log: (msg) -> console?.log msg if @opts.debug # Simplify logger()
@@ -40,6 +35,10 @@ window.dCache = {} if window.dCache == undefined
       debug  : false
       fx     : 'none'
       'lock' : false
+      timer  : false
+      inSpeed  : false
+      outSpeed : false
+      speed    : 'slow'
 
 
     ### initiator
@@ -138,16 +137,31 @@ window.dCache = {} if window.dCache == undefined
 
       effects = 
         none : ->
-          console.log 'default'
+          obj.el.on 'paging', (evt, param) ->
+
+            # hide all other tabs
+            obj.el.find('.tab').hide()
+
+            # show tab i
+            obj.el.find('.tab').eq(param['i']).show()
 
         fade : ->
-          console.log 'fade'
+          obj.el.on 'paging', (evt, param) ->
+
+            # hide and show tags
+            obj.el.find('.tab').fadeOut(param['outSpeed']).promise().done ->
+              obj.el.find('.tab').eq(param['i']).fadeIn(param['inSpeed'])
+
 
         slideX : ->
-          console.log 'slideX'
+          obj.el.on 'paging', (evt, param) ->
+            console.log param
+            console.log 'slideX'
 
         slideY : ->
-          console.log 'slideY'
+          obj.el.on 'paging', (evt, param) ->
+            console.log param
+            console.log 'slideY'
 
       effects[fx]()
     
@@ -172,8 +186,12 @@ window.dCache = {} if window.dCache == undefined
   ### Adds plugin object to jQuery ###
   $.fn[ pluginName ] = (options) ->
     return @each ()->
+      self = $(this)
+
       D = new dCache['dTab'](this, options)
       D.init()
+
+      D.log D.opts
 
       ### build it 
       ###
@@ -186,10 +204,24 @@ window.dCache = {} if window.dCache == undefined
           if no effects options, use default ###
       if D.opts.fx then D.fx(D.opts.fx) else D.fx()
 
-      D.log D.opts
+      ### Trigger ###
+      self.on 'click', '.nav li', ->
+        if $(this).hasClass('active')
+          return false
 
-      # pager
-    
+        # add active class
+        $(this).addClass('active')
+               .siblings()
+               .removeClass('active')
+        
+        # trigger effects
+        self.trigger 'paging', {
+            i: $(@).index()
+            inSpeed: if !D.opts.inSpeed then D.opts.speed
+            outSpeed: if !D.opts.outSpeed then D.opts.speed
+        }
+            
+
       # history
 
       # responsive
@@ -201,4 +233,4 @@ window.dCache = {} if window.dCache == undefined
  Any new methods will require re-initiate the plugin
 ================================================= ###
 $ -> 
-    $('.dtab').devTab({test:'something', debug:true});
+    $('.dtab').devTab({debug:true});
