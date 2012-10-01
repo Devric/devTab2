@@ -105,10 +105,11 @@ if (window.dCache === void 0) {
         });
       }
       if (this.opts['fx'] === 'none' || this.opts['fx'] === 'fade') {
-        return this.tabs.not(':first').css({
+        this.tabs.not(':first').css({
           display: 'none'
         });
       }
+      return this.el.find('.nav').children().first().addClass('active');
     };
 
     /* FX
@@ -151,6 +152,11 @@ if (window.dCache === void 0) {
       };
       return effects[fx]();
     };
+
+    /* utility
+    =================
+    */
+
 
     return dTab;
 

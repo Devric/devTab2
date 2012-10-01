@@ -125,6 +125,13 @@ window.dCache = {} if window.dCache == undefined
         @tabs.not(':first').css
             display: 'none'
 
+      
+      # Active class
+      # Select the first on start
+      #
+      # ===================
+      @el.find('.nav').children().first().addClass('active')
+
 
     ### FX
     ================= ###
@@ -165,6 +172,9 @@ window.dCache = {} if window.dCache == undefined
 
       effects[fx]()
     
+
+    ### utility
+    ================= ###
 
 
   ### == Exports ============= ###
