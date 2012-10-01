@@ -23,13 +23,23 @@ if (window.dCache === void 0) {
     */
 
     function dTab(el, opts) {
+      /* Assign
+      */
       this.el = $(el);
       this.opts = opts;
       this.meta = this.el.data();
       this.id = this.el.attr('id');
-      this.tabs = this.el.find('.tabs');
+      this.tabs = this.el.find('.tab');
+      this.title = this.tabs.find('.title');
       this.width = this.tabs.outerWidth(true);
       this.height = this.tabs.outerHeight(true);
+      /* Trigger
+      */
+
+      $($(el)).on('click', '.nav li', function() {
+        console.log($(this).closest($(el)));
+        return console.log($(this).index());
+      });
     }
 
     dTab.prototype.log = function(msg) {
@@ -44,9 +54,9 @@ if (window.dCache === void 0) {
 
 
     dTab.prototype.defaults = {
-      'lock': false,
+      debug: false,
       fx: 'none',
-      debug: false
+      'lock': false
     };
 
     /* initiator
@@ -64,25 +74,40 @@ if (window.dCache === void 0) {
 
 
     dTab.prototype.build = function(obj) {
-      this.log('set: ' + obj['width']);
-      this.log('set: ' + obj['height']);
-      this.log('============');
-      this.log('auto: ' + this.weight);
-      this.log('auto: ' + this.height);
-      this.log('============');
-      this.el.prepend('<ul class="nav" />');
-      this.el.find('.tabs').find('.title').prependTo(this.el.find('.nav'));
-      if (this.opts['fx'] !== 'fade' || this.opts['fx'] !== 'none' || this.opts['lock']) {
-        this.el.css({
+      var nav, title;
+      this.el.prepend('<div class="container" />');
+      nav = '<ul class="nav" />';
+      switch (this.opts['nav']) {
+        case 'bot':
+          this.el.append(nav);
+          break;
+        case 'both':
+          this.el.append(nav);
+          this.el.prepend(nav);
+          break;
+        default:
+          this.el.prepend(nav);
+      }
+      title = this.tabs.find('.title');
+      title.prependTo(this.el.find('.nav'));
+      title.each(function() {
+        return $(this).replaceWith('<li>' + $(this).html() + '</li>');
+      });
+      this.tabs.prependTo(this.el.find('.container'));
+      if (this.opts['lock'] || (this.opts['fx'] !== 'none' && this.opts['fx'] !== 'fade')) {
+        this.el.find('.container').css({
+          background: 'blue',
           overflow: 'hidden',
           width: (obj['width'] ? obj['width'] : this.width),
           height: (obj['height'] ? obj['height'] : this.height)
         });
-        return this.tabs.css({
+        this.tabs.css({
+          overflow: 'hidden',
           width: (obj['width'] ? obj['width'] : this.width),
           height: (obj['height'] ? obj['height'] : this.height)
         });
-      } else {
+      }
+      if (this.opts['fx'] === 'none' || this.opts['fx'] === 'fade') {
         return this.tabs.not(':first').css({
           display: 'none'
         });
@@ -97,12 +122,12 @@ if (window.dCache === void 0) {
     dTab.prototype.fx = function(fx) {
       var effects, obj;
       obj = this;
-      if (!fx || fx === null) {
+      if (!fx) {
         fx = 'none';
       }
       effects = {
         none: function() {
-          return console.log('detault');
+          return console.log('default');
         },
         fade: function() {
           return console.log('fade');

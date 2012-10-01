@@ -15,11 +15,12 @@ html
 
     body
 
+        h4 no default
         #none.dtab
-            .tabs
+            .tab
                 .title title two
                 .content this is just some short one
-            .tabs
+            .tab
                 .title title two tab 2
                 .content waaaa
                     | nothing really new
@@ -32,9 +33,11 @@ html
                     | nothing really new
                     | nothing really new
 
+        hr
 
+        h4 slideX, width 130
         #set.dtab(data-width="130", data-fx="slideX")
-            .tabs
+            .tab
                 .title title one
                 .content this is just some long texts, nothing special
                         | with some joints texts, nothing special
@@ -45,24 +48,25 @@ html
                         | with some joints texts, nothing special
                         | ontent this is just some lon
                         | with some joints
-            .tabs
+            .tab
                 .title title blah
                 .content this is just some thing
 
-            .tabs
+            .tab
                 .title title again
                 .content this is just some thing
                     | nothing really new
                     | nothing really new
                     | nothing really new
 
-
         section(style="margin:10px; border: 2px solid #ddd")
+
+            h4 fade, lock
             #fadeNlock.dtab(data-fx="fade", data-lock="true")
-                .tabs
+                .tab
                     .title title two
                     .content this is just some short one
-                .tabs
+                .tab
                     .title title two tab 2
                     .content waaaa
                         | nothing really new
@@ -75,11 +79,13 @@ html
                         | nothing really new
                         | nothing really new
 
+            hr
+            h4 fade
             #fade.dtab(data-fx="fade")
-                .tabs
+                .tab
                     .title title two
                     .content this is just some short one
-                .tabs
+                .tab
                     .title title two tab 2
                     .content waaaa
                         | nothing really new

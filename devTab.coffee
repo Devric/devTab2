@@ -14,24 +14,32 @@ window.dCache = {} if window.dCache == undefined
     ### default elements
     ====================== ###
     constructor: (el, opts)->
+      ### Assign ###
       @el   = $(el)      # $itself
       @opts = opts       # $(el).plugin( opts )
       @meta = @el.data() # allow inline
 
       @id     = @el.attr('id')
-      @tabs   = @el.find('.tabs')
+      @tabs   = @el.find('.tab')
+      @title  = @tabs.find('.title')
       @width  = @tabs.outerWidth(true)
       @height = @tabs.outerHeight(true)
 
-    log: (msg) -> console?.log msg if @opts.debug # Simplify logger() ***STRIP***
+      ### Trigger ###
+      $($(el)).on 'click', '.nav li', ->
+        console.log $(@).closest($(el))
+        console.log $(@).index()
+      
+
+    log: (msg) -> console?.log msg if @opts.debug # Simplify logger()
 
 
     ### plugin default options 
     ====================== ###
     defaults:
+      debug  : false
+      fx     : 'none'
       'lock' : false
-      fx            : 'none'
-      debug         : false
 
 
     ### initiator
@@ -47,49 +55,76 @@ window.dCache = {} if window.dCache == undefined
     ================= ###
     build: (obj) ->
 
-      @log 'set: ' + obj['width']
-      @log 'set: ' + obj['height']
-      @log '============'
-
-      @log 'auto: ' + @weight
-      @log 'auto: ' + @height
-      @log '============'
-
-      # create navs
-      # ===================
-      @el.prepend('<ul class="nav" />')
-      @el.find('.tabs').find('.title').prependTo( @el.find('.nav') )
-
-      # @if
-      # fx is not fade || none
+      # create containers
       #
+      #
+      # creating containers
+      # to wrap tabs and nav
+      # @if nav-bot, create append
+      # @if nav-both, create both
+      # @else nav, create prepend
+      # ==================
+      @el.prepend('<div class="container" />')
+
+      nav = '<ul class="nav" />'
+
+      switch @opts['nav']
+        when 'bot'
+          @el.append(nav)
+        when 'both'
+          @el.append(nav)
+          @el.prepend(nav)
+        else
+          @el.prepend(nav)
+
+
+      # Push el into container
+      #
+      #
+      # ===================
+      title = @tabs.find('.title')
+      title.prependTo( @el.find('.nav') )
+
+      # change to li
+      title.each ->
+        $(this).replaceWith '<li>' + $(this).html() + '</li>'
+
+      @tabs.prependTo( @el.find('.container') )
+
+
+      # Build dimension
+      # @if
+      # fx is not fade || none and lock
       #
       # Lock dimension to keep same size container and tab
       # ===================
-      if @opts['fx'] != 'fade' || @opts['fx'] != 'none' || @opts['lock'] 
 
+      if @opts['lock'] || ( @opts['fx'] != 'none' and @opts['fx'] != 'fade' )
         # container style
         # ===================
-        @el.css
+        @el.find('.container').css
+          background: 'blue'
           overflow: 'hidden'
           width  : (if obj['width']  then obj['width']  else @width)
           height : (if obj['height'] then obj['height'] else @height)
+            
 
         # tab style
         # ===================
         @tabs.css
+          overflow: 'hidden'
           width  : (if obj['width']  then obj['width']  else @width)
           height : (if obj['height'] then obj['height'] else @height)
 
-      else
-        # @else
-        # fx is fade or none and not locked height
-        #
-        # hide divs if is fade and null
-        # ===================
+      
+      # @if
+      # fx == fade || none
+      # just hide none first
+      #
+      # ===================
+      if @opts['fx'] == 'none' || @opts['fx'] == 'fade'
         @tabs.not(':first').css
             display: 'none'
-
 
 
     ### FX
@@ -99,11 +134,11 @@ window.dCache = {} if window.dCache == undefined
       obj = @
 
       # set fx to default if !fx
-      fx = 'none' if !fx || fx ==  null
+      fx = 'none' if !fx
 
       effects = 
         none : ->
-          console.log 'detault'
+          console.log 'default'
 
         fade : ->
           console.log 'fade'
@@ -117,6 +152,7 @@ window.dCache = {} if window.dCache == undefined
       effects[fx]()
     
 
+
   ### == Exports ============= ###
   dCache['dTab'] = dTab
 
@@ -129,9 +165,9 @@ window.dCache = {} if window.dCache == undefined
 (($, window)->
   if window.plugin == undefined 
     window.plugin = {}
-  pluginName                    = 'devTab'
-  plugin[ pluginName ]          = '0.1.0Dead simple tabs with slideshows'
-  plugin[ pluginName + '_url']  = 'devric.co.cc'
+  pluginName                   = 'devTab'
+  plugin[ pluginName ]         = '0.1.0Dead simple tabs with slideshows'
+  plugin[ pluginName + '_url'] = 'devric.co.cc'
 
   ### Adds plugin object to jQuery ###
   $.fn[ pluginName ] = (options) ->
