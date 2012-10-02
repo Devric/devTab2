@@ -86,7 +86,7 @@ window.dCache = {} if window.dCache == undefined
 
       # change to li
       title.each ->
-        $(this).replaceWith '<li>' + $(this).html() + '</li>'
+        $(this).replaceWith '<li><span class="text">' + $(this).html() + '</span></li>'
 
       @tabs.prependTo( @el.find('.container') )
 
@@ -176,9 +176,14 @@ window.dCache = {} if window.dCache == undefined
 
     ### utility
     ================= ###
-    utility:
+    util:
       findDiff: ->
-        console.log 'find diff'
+        num = arguments[0] - arguments[1]
+
+        diff: Math.abs(num)
+        back: if ( num < 0 ) then true else false
+
+
 
 
   ### == Exports ============= ###

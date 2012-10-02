@@ -88,7 +88,7 @@ if (window.dCache === void 0) {
       title = this.tabs.find('.title');
       title.prependTo(this.el.find('.nav'));
       title.each(function() {
-        return $(this).replaceWith('<li>' + $(this).html() + '</li>');
+        return $(this).replaceWith('<li><span class="text">' + $(this).html() + '</span></li>');
       });
       this.tabs.prependTo(this.el.find('.container'));
       if (this.opts['lock'] || (this.opts['fx'] !== 'none' && this.opts['fx'] !== 'fade')) {
@@ -158,9 +158,14 @@ if (window.dCache === void 0) {
     */
 
 
-    dTab.prototype.utility = {
+    dTab.prototype.util = {
       findDiff: function() {
-        return console.log('find diff');
+        var num;
+        num = arguments[0] - arguments[1];
+        return {
+          diff: Math.abs(num),
+          back: num < 0 ? true : false
+        };
       }
     };
 
