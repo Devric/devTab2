@@ -21,9 +21,16 @@ window.dCache = {} if window.dCache == undefined
 
       @id     = @el.attr('id')
       @tabs   = @el.find('.tab')
-      @title  = @tabs.find('.title')
-      @width  = @tabs.outerWidth(true)
-      @height = @tabs.outerHeight(true)
+
+      getLargest = (el,d) ->
+        size = []
+        el.each ->
+          size.push $(this)[d]()
+
+        return Math.max.apply(this, size)
+
+      @width  = getLargest(@tabs, 'width')
+      @height = getLargest(@tabs, 'height')
       
 
     log: (msg) -> console?.log msg if @opts.debug # Simplify logger()
@@ -38,7 +45,7 @@ window.dCache = {} if window.dCache == undefined
       timer  : false
       inSpeed  : false
       outSpeed : false
-      speed    : 'slow'
+      speed    : 250
 
 
     ### initiator
@@ -146,16 +153,15 @@ window.dCache = {} if window.dCache == undefined
       effects = 
         none : ->
           obj.el.on 'paging', (evt, param) ->
-
             # hide all other tabs
             obj.el.find('.tab').hide()
 
             # show tab i
             obj.el.find('.tab').eq(param['i']).show()
 
+
         fade : ->
           obj.el.on 'paging', (evt, param) ->
-
             # hide and show tags
             obj.el.find('.tab').fadeOut(param['outSpeed']).promise().done ->
               obj.el.find('.tab').eq(param['i']).fadeIn(param['inSpeed'])
@@ -163,8 +169,7 @@ window.dCache = {} if window.dCache == undefined
 
         slideX : ->
           obj.el.on 'paging', (evt, param) ->
-            console.log param
-            console.log 'slideX'
+
 
         slideY : ->
           obj.el.on 'paging', (evt, param) ->
@@ -215,7 +220,7 @@ window.dCache = {} if window.dCache == undefined
       D = new dCache['dTab'](this, options)
       D.init()
 
-      D.log D.opts
+      D.log D
 
       ### build it 
       ###

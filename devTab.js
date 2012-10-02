@@ -25,14 +25,23 @@ if (window.dCache === void 0) {
     function dTab(el, opts) {
       /* Assign
       */
+
+      var getLargest;
       this.el = $(el);
       this.opts = opts;
       this.meta = this.el.data();
       this.id = this.el.attr('id');
       this.tabs = this.el.find('.tab');
-      this.title = this.tabs.find('.title');
-      this.width = this.tabs.outerWidth(true);
-      this.height = this.tabs.outerHeight(true);
+      getLargest = function(el, d) {
+        var size;
+        size = [];
+        el.each(function() {
+          return size.push($(this)[d]());
+        });
+        return Math.max.apply(this, size);
+      };
+      this.width = getLargest(this.tabs, 'width');
+      this.height = getLargest(this.tabs, 'height');
     }
 
     dTab.prototype.log = function(msg) {
@@ -53,7 +62,7 @@ if (window.dCache === void 0) {
       timer: false,
       inSpeed: false,
       outSpeed: false,
-      speed: 'slow'
+      speed: 250
     };
 
     /* initiator
@@ -138,10 +147,7 @@ if (window.dCache === void 0) {
           });
         },
         slideX: function() {
-          return obj.el.on('paging', function(evt, param) {
-            console.log(param);
-            return console.log('slideX');
-          });
+          return obj.el.on('paging', function(evt, param) {});
         },
         slideY: function() {
           return obj.el.on('paging', function(evt, param) {
@@ -204,7 +210,7 @@ if (window.dCache === void 0) {
       self = $(this);
       D = new dCache['dTab'](this, options);
       D.init();
-      D.log(D.opts);
+      D.log(D);
       /* build it
       */
 
