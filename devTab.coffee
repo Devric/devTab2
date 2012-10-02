@@ -183,6 +183,11 @@ window.dCache = {} if window.dCache == undefined
         diff: Math.abs(num)
         back: if ( num < 0 ) then true else false
 
+      setActive: (el) ->
+        $(el).addClass('active')
+             .siblings()
+             .removeClass('active')
+
 
 
 
@@ -229,16 +234,20 @@ window.dCache = {} if window.dCache == undefined
           return false
 
         # add active class
-        $(this).addClass('active')
-               .siblings()
-               .removeClass('active')
+        D.util.setActive(this)
+
+        # find index differnce and direction
+        diff = D.util.findDiff( self.find('.active').index(), $(@).index() )
         
         # trigger effects
         self.trigger 'paging', {
             i: $(@).index()
-            inSpeed: if !D.opts.inSpeed then D.opts.speed
-            outSpeed: if !D.opts.outSpeed then D.opts.speed
+            inSpeed  : if !D.opts.inSpeed then D.opts.speed
+            outSpeed : if !D.opts.outSpeed then D.opts.speed
+            diff     : diff.diff
+            negative : diff.back
         }
+        
 
 
       # history

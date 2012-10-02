@@ -166,6 +166,9 @@ if (window.dCache === void 0) {
           diff: Math.abs(num),
           back: num < 0 ? true : false
         };
+      },
+      setActive: function(el) {
+        return $(el).addClass('active').siblings().removeClass('active');
       }
     };
 
@@ -222,14 +225,18 @@ if (window.dCache === void 0) {
       */
 
       return self.on('click', '.nav li', function() {
+        var diff;
         if ($(this).hasClass('active')) {
           return false;
         }
-        $(this).addClass('active').siblings().removeClass('active');
+        D.util.setActive(this);
+        diff = D.util.findDiff(self.find('.active').index(), $(this).index());
         return self.trigger('paging', {
           i: $(this).index(),
           inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
-          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0
+          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
+          diff: diff.diff,
+          negative: diff.back
         });
       });
     });
