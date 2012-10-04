@@ -25,23 +25,11 @@ if (window.dCache === void 0) {
     function dTab(el, opts) {
       /* Assign
       */
-
-      var getLargest;
       this.el = $(el);
       this.opts = opts;
       this.meta = this.el.data();
       this.id = this.el.attr('id');
       this.tabs = this.el.find('.tab');
-      getLargest = function(el, d) {
-        var size;
-        size = [];
-        el.each(function() {
-          return size.push($(this)[d]());
-        });
-        return Math.max.apply(this, size);
-      };
-      this.width = getLargest(this.tabs, 'width');
-      this.height = getLargest(this.tabs, 'height');
     }
 
     dTab.prototype.log = function(msg) {
@@ -71,7 +59,9 @@ if (window.dCache === void 0) {
 
 
     dTab.prototype.init = function() {
-      return this.opts = $.extend({}, this.defaults, this.opts, this.meta);
+      this.opts = $.extend({}, this.defaults, this.opts, this.meta);
+      this.width = this.opts.width ? this.opts.width : this.util.getLargest(this.tabs, 'width');
+      return this.height = this.opts.height ? this.opts.height : this.util.getLargest(this.tabs, 'height');
     };
 
     /*  builder
@@ -102,7 +92,6 @@ if (window.dCache === void 0) {
       this.tabs.prependTo(this.el.find('.container'));
       if (this.opts['lock'] || (this.opts['fx'] !== 'none' && this.opts['fx'] !== 'fade')) {
         this.el.find('.container').css({
-          background: 'blue',
           overflow: 'hidden',
           width: (obj['width'] ? obj['width'] : this.width),
           height: (obj['height'] ? obj['height'] : this.height)
@@ -147,12 +136,26 @@ if (window.dCache === void 0) {
           });
         },
         slideX: function() {
-          return obj.el.on('paging', function(evt, param) {});
+          var totalWidth;
+          totalWidth = obj.width * obj.tabs.length;
+          obj.el.find('.container').wrapInner('<div class="js-tab-full-size" style="width: ' + totalWidth + 'px; height:' + obj.height + 'px" />');
+          obj.tabs.css({
+            float: 'left'
+          });
+          return obj.el.on('paging', function(evt, param) {
+            return obj.el.find('.js-tab-full-size').animate({
+              'margin-left': param['back'] + (param['diff'] * obj.width)
+            });
+          });
         },
         slideY: function() {
+          var totalHeight;
+          totalHeight = obj.height * obj.tabs.length;
+          obj.el.find('.container').wrapInner('<div class="js-tab-full-size" style="width: ' + obj.width + 'px; height:' + totalHeight + 'px" />');
           return obj.el.on('paging', function(evt, param) {
-            console.log(param);
-            return console.log('slideY');
+            return obj.el.find('.js-tab-full-size').animate({
+              'margin-top': param['back'] + (param['diff'] * obj.height)
+            });
           });
         }
       };
@@ -170,11 +173,19 @@ if (window.dCache === void 0) {
         num = arguments[0] - arguments[1];
         return {
           diff: Math.abs(num),
-          back: num < 0 ? true : false
+          back: num < 0 ? '-=' : '+='
         };
       },
       setActive: function(el) {
         return $(el).addClass('active').siblings().removeClass('active');
+      },
+      getLargest: function(el, d) {
+        var size;
+        size = [];
+        el.each(function() {
+          return size.push($(this)[d]());
+        });
+        return Math.max.apply(this, size);
       }
     };
 
@@ -208,6 +219,13 @@ if (window.dCache === void 0) {
     return this.each(function() {
       var D, self;
       self = $(this);
+      /* Prevent re-initialize
+      */
+
+      if ($(this).hasClass('js-init')) {
+        return false;
+      }
+      $(this).addClass('js-init');
       D = new dCache['dTab'](this, options);
       D.init();
       D.log(D);
@@ -235,15 +253,15 @@ if (window.dCache === void 0) {
         if ($(this).hasClass('active')) {
           return false;
         }
-        D.util.setActive(this);
         diff = D.util.findDiff(self.find('.active').index(), $(this).index());
-        return self.trigger('paging', {
+        self.trigger('paging', {
           i: $(this).index(),
           inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
           outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
           diff: diff.diff,
-          negative: diff.back
+          back: diff.back
         });
+        return D.util.setActive(this);
       });
     });
   };

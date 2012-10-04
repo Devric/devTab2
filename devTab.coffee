@@ -22,16 +22,6 @@ window.dCache = {} if window.dCache == undefined
       @id     = @el.attr('id')
       @tabs   = @el.find('.tab')
 
-      getLargest = (el,d) ->
-        size = []
-        el.each ->
-          size.push $(this)[d]()
-
-        return Math.max.apply(this, size)
-
-      @width  = getLargest(@tabs, 'width')
-      @height = getLargest(@tabs, 'height')
-      
 
     log: (msg) -> console?.log msg if @opts.debug # Simplify logger()
 
@@ -55,6 +45,8 @@ window.dCache = {} if window.dCache == undefined
     # @meta     : dom-data options
     init: ->
       @opts = $.extend {}, @defaults, @opts, @meta
+      @width  = if @opts.width then @opts.width else @util.getLargest(@tabs, 'width')
+      @height = if @opts.height then @opts.height else @util.getLargest(@tabs, 'height')
 
 
     ###  builder
@@ -104,12 +96,10 @@ window.dCache = {} if window.dCache == undefined
       #
       # Lock dimension to keep same size container and tab
       # ===================
-
       if @opts['lock'] || ( @opts['fx'] != 'none' and @opts['fx'] != 'fade' )
         # container style
         # ===================
         @el.find('.container').css
-          background: 'blue'
           overflow: 'hidden'
           width  : (if obj['width']  then obj['width']  else @width)
           height : (if obj['height'] then obj['height'] else @height)
@@ -168,13 +158,31 @@ window.dCache = {} if window.dCache == undefined
 
 
         slideX : ->
+          # build for this fx
+          totalWidth = obj.width * obj.tabs.length
+          obj.el.find('.container').wrapInner('<div class="js-tab-full-size" style="width: ' + totalWidth + 'px; height:' + obj.height + 'px" />')
+
+          obj.tabs.css
+            float: 'left'
+
+          # event action
           obj.el.on 'paging', (evt, param) ->
+            obj.el.find('.js-tab-full-size').animate
+              # param['back'] returns -= || +=
+              'margin-left': param['back'] + ( param['diff'] * obj.width )
 
 
         slideY : ->
+          # build for this fx
+          totalHeight = obj.height * obj.tabs.length
+          obj.el.find('.container').wrapInner('<div class="js-tab-full-size" style="width: ' + obj.width + 'px; height:' + totalHeight + 'px" />')
+
+          # event action
           obj.el.on 'paging', (evt, param) ->
-            console.log param
-            console.log 'slideY'
+            obj.el.find('.js-tab-full-size').animate
+              # param['back'] returns -= || +=
+              'margin-top': param['back'] + ( param['diff'] * obj.height )
+
 
       effects[fx]()
     
@@ -182,16 +190,26 @@ window.dCache = {} if window.dCache == undefined
     ### utility
     ================= ###
     util:
+      # @return integer
+      # @return boolean
       findDiff: ->
         num = arguments[0] - arguments[1]
-
         diff: Math.abs(num)
-        back: if ( num < 0 ) then true else false
+        back: if ( num < 0 ) then '-=' else '+='
 
+      # @return function
       setActive: (el) ->
         $(el).addClass('active')
              .siblings()
              .removeClass('active')
+
+      # @return integer
+      getLargest : (el,d) ->
+        size = []
+        el.each ->
+          size.push $(this)[d]()
+
+        return Math.max.apply(this, size)
 
 
 
@@ -217,6 +235,13 @@ window.dCache = {} if window.dCache == undefined
     return @each ()->
       self = $(this)
 
+      ### Prevent re-initialize
+      ### # so that new method initialize won't affect the old
+      if $(this).hasClass('js-init')
+        return false
+      $(this).addClass('js-init')
+
+
       D = new dCache['dTab'](this, options)
       D.init()
 
@@ -238,9 +263,6 @@ window.dCache = {} if window.dCache == undefined
         if $(this).hasClass('active')
           return false
 
-        # add active class
-        D.util.setActive(this)
-
         # find index differnce and direction
         diff = D.util.findDiff( self.find('.active').index(), $(@).index() )
         
@@ -250,8 +272,11 @@ window.dCache = {} if window.dCache == undefined
             inSpeed  : if !D.opts.inSpeed then D.opts.speed
             outSpeed : if !D.opts.outSpeed then D.opts.speed
             diff     : diff.diff
-            negative : diff.back
+            back     : diff.back
         }
+
+        # add active class
+        D.util.setActive(this)
         
 
 
