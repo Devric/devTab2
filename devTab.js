@@ -50,7 +50,8 @@ if (window.dCache === void 0) {
       timer: false,
       inSpeed: false,
       outSpeed: false,
-      speed: 250
+      speed: 250,
+      trigger: 'click'
     };
 
     /* initiator
@@ -248,7 +249,7 @@ if (window.dCache === void 0) {
       /* Trigger
       */
 
-      return self.on('click', '.nav li', function() {
+      return self.on(D.opts.trigger, '.nav li', function() {
         var diff;
         if ($(this).hasClass('active')) {
           return false;

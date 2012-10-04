@@ -36,6 +36,7 @@ window.dCache = {} if window.dCache == undefined
       inSpeed  : false
       outSpeed : false
       speed    : 250
+      trigger  : 'click'
 
 
     ### initiator
@@ -259,7 +260,7 @@ window.dCache = {} if window.dCache == undefined
       if D.opts.fx then D.fx(D.opts.fx) else D.fx()
 
       ### Trigger ###
-      self.on 'click', '.nav li', ->
+      self.on D.opts.trigger, '.nav li', ->
         if $(this).hasClass('active')
           return false
 
