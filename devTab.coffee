@@ -70,9 +70,6 @@ window.dCache = {} if window.dCache == undefined
       switch @opts['nav']
         when 'bot'
           @el.append(nav)
-        when 'both'
-          @el.append(nav)
-          @el.prepend(nav)
         else
           @el.prepend(nav)
 
@@ -278,8 +275,6 @@ window.dCache = {} if window.dCache == undefined
 
         # add active class
         D.util.setActive(this)
-        
-
 
       # history
 

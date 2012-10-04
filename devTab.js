@@ -78,10 +78,6 @@ if (window.dCache === void 0) {
         case 'bot':
           this.el.append(nav);
           break;
-        case 'both':
-          this.el.append(nav);
-          this.el.prepend(nav);
-          break;
         default:
           this.el.prepend(nav);
       }
