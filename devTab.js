@@ -71,18 +71,38 @@ if (window.dCache === void 0) {
 
 
     dTab.prototype.build = function(obj) {
-      var nav, title;
+      var i, menu, nav, title;
       this.el.prepend('<div class="container" />');
-      nav = '<ul class="nav" />';
-      switch (this.opts['nav']) {
-        case 'bot':
-          this.el.append(nav);
-          break;
-        default:
-          this.el.prepend(nav);
+      menu = '<ul class="menu" />';
+      if (this.opts['menu']) {
+        this.el.append(menu);
+      } else {
+        this.el.prepend(menu);
+      }
+      nav = '<ul class="nav">';
+      if (this.opts['nav']) {
+        switch (this.opts['nav']) {
+          case 'both':
+            this.el.find('.container').before(nav);
+            this.el.find('.container').after(nav);
+            break;
+          case 'bot':
+            this.el.find('.container').after(nav);
+            break;
+          default:
+            this.el.find('.container').before(nav);
+        }
+        if (this.opts['pager']) {
+          i = this.tabs.length + 1;
+          while (i -= 1) {
+            this.el.find('.nav').prepend('<li>' + i + '</li>');
+          }
+        }
+        this.el.find('.nav').prepend('<li class="prev">prev</li>');
+        this.el.find('.nav').append('<li class="next">next</li>');
       }
       title = this.tabs.find('.title');
-      title.prependTo(this.el.find('.nav'));
+      title.prependTo(this.el.find('.menu'));
       title.each(function() {
         return $(this).replaceWith('<li><span class="text">' + $(this).html() + '</span></li>');
       });
@@ -104,7 +124,7 @@ if (window.dCache === void 0) {
           display: 'none'
         });
       }
-      return this.el.find('.nav').children().first().addClass('active');
+      return this.el.find('.menu').children().first().addClass('active');
     };
 
     /* FX
@@ -242,10 +262,10 @@ if (window.dCache === void 0) {
       } else {
         D.fx();
       }
-      /* Trigger
+      /* Trigger : menu
       */
 
-      return self.on(D.opts.trigger, '.nav li', function() {
+      self.on(D.opts.trigger, '.menu li', function() {
         var diff;
         if ($(this).hasClass('active')) {
           return false;
@@ -259,6 +279,31 @@ if (window.dCache === void 0) {
           back: diff.back
         });
         return D.util.setActive(this);
+      });
+      /* Trigger : nav
+      */
+
+      self.on('click', '.prev', function() {
+        var diff;
+        diff = D.util.findDiff(2, 1);
+        return self.trigger('paging', {
+          i: $(this).prev().index(),
+          inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
+          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
+          diff: diff.diff,
+          back: diff.back
+        });
+      });
+      return self.on('click', '.next', function() {
+        var diff;
+        diff = D.util.findDiff(1, 2);
+        return self.trigger('paging', {
+          i: $(this).next().index(),
+          inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
+          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
+          diff: diff.diff,
+          back: diff.back
+        });
       });
     });
   };

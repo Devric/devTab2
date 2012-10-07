@@ -35,7 +35,7 @@ html
         hr
 
         h4 slideX, width 130
-        #set.dtab(data-width="130", data-fx="slideX")
+        #set.dtab(data-width="130", data-fx="slideX", data-nav="top", data-pager="true")
             .tab
                 .title title one
                 .content [1] this is just some long texts, nothing special
@@ -57,11 +57,15 @@ html
                     | nothing really new
                     | nothing really new
                     | nothing really new
+            .tab
+                .title title blah
+                .content [2] this is just some thing
+
 
         section(style="margin:10px; border: 2px solid #ddd")
 
             h4 fade, lock, bot
-            #fadeNlock.dtab(data-fx="fade", data-lock="true", data-nav="bot")
+            #fadeNlock.dtab(data-fx="fade", data-lock="true", data-menu="bot")
                 .tab
                     .title title two
                     .content this is just some short one
@@ -99,7 +103,7 @@ html
 
             hr
             h4 slideY
-            #fade.dtab(data-fx="slideY")
+           #fade.dtab(data-fx="slideY", data-nav="both")
                 .tab
                     .title title one
                     .content this is just some short one

@@ -58,28 +58,60 @@ window.dCache = {} if window.dCache == undefined
       #
       #
       # creating containers
-      # to wrap tabs and nav
-      # @if nav-bot, create append
-      # @if nav-both, create both
-      # @else nav, create prepend
+      # to wrap tabs and menu
+      # @if menu-bot, create append
+      # @if menu-both, create both
+      # @else menu, create prepend
       # ==================
       @el.prepend('<div class="container" />')
 
-      nav = '<ul class="nav" />'
 
-      switch @opts['nav']
-        when 'bot'
-          @el.append(nav)
-        else
-          @el.prepend(nav)
+      # menu
+      #
+      #
+      #===================
+      menu = '<ul class="menu" />'
+      if @opts['menu'] then @el.append(menu) else @el.prepend(menu)
 
+
+      # menu
+      #
+      #
+      #===================
+      nav = '<ul class="nav">'
+
+      if @opts['nav']
+        switch @opts['nav']
+          when 'both'
+            @el.find('.container').before(nav)
+            @el.find('.container').after(nav)
+          when 'bot'
+            @el.find('.container').after(nav)
+          else
+            @el.find('.container').before(nav)
+
+        # Pager
+        #
+        #
+        #===================
+
+        # pages
+        if @opts['pager']
+          i = @tabs.length + 1
+          while i -= 1
+            @el.find('.nav').prepend('<li>' + i + '</li>')
+
+        # prev, next
+        @el.find('.nav').prepend('<li class="prev">prev</li>')
+        @el.find('.nav').append('<li class="next">next</li>')
+        
 
       # Push el into container
       #
       #
       # ===================
       title = @tabs.find('.title')
-      title.prependTo( @el.find('.nav') )
+      title.prependTo( @el.find('.menu') )
 
       # change to li
       title.each ->
@@ -125,7 +157,8 @@ window.dCache = {} if window.dCache == undefined
       # Select the first on start
       #
       # ===================
-      @el.find('.nav').children().first().addClass('active')
+      @el.find('.menu').children().first().addClass('active')
+
 
 
     ### FX
@@ -256,8 +289,8 @@ window.dCache = {} if window.dCache == undefined
           if no effects options, use default ###
       if D.opts.fx then D.fx(D.opts.fx) else D.fx()
 
-      ### Trigger ###
-      self.on D.opts.trigger, '.nav li', ->
+      ### Trigger : menu ###
+      self.on D.opts.trigger, '.menu li', ->
         if $(this).hasClass('active')
           return false
 
@@ -275,6 +308,27 @@ window.dCache = {} if window.dCache == undefined
 
         # add active class
         D.util.setActive(this)
+
+      ### Trigger : nav ###
+      self.on 'click', '.prev', ->
+        diff = D.util.findDiff( 2, 1 )
+        self.trigger 'paging', {
+            i: $(@).prev().index()
+            inSpeed  : if !D.opts.inSpeed then D.opts.speed
+            outSpeed : if !D.opts.outSpeed then D.opts.speed
+            diff     : diff.diff
+            back     : diff.back
+        }
+
+      self.on 'click', '.next', ->
+        diff = D.util.findDiff( 1, 2 )
+        self.trigger 'paging', {
+            i: $(@).next().index()
+            inSpeed  : if !D.opts.inSpeed then D.opts.speed
+            outSpeed : if !D.opts.outSpeed then D.opts.speed
+            diff     : diff.diff
+            back     : diff.back
+        }
 
       # history
 
