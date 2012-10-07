@@ -46,7 +46,7 @@ window.dCache = {} if window.dCache == undefined
     # @meta     : dom-data options
     init: ->
       @opts = $.extend {}, @defaults, @opts, @meta
-      @width  = if @opts.width then @opts.width else @util.getLargest(@tabs, 'width')
+      @width  = if @opts.width  then @opts.width  else @util.getLargest(@tabs, 'width')
       @height = if @opts.height then @opts.height else @util.getLargest(@tabs, 'height')
 
 
@@ -66,53 +66,49 @@ window.dCache = {} if window.dCache == undefined
       @el.prepend('<div class="container" />')
 
 
-      # menu
+      # menu, nav, pager
       #
       #
       #===================
+
+      ### Menu
+      ###
       menu = '<ul class="menu" />'
       if @opts['menu'] then @el.append(menu) else @el.prepend(menu)
 
+      title = @tabs.find('.title')
+      title.prependTo( @el.find('.menu') )
 
-      # menu
-      #
-      #
-      #===================
+      ### nav
+      ###
       nav = '<ul class="nav">'
 
-      if @opts['nav']
+      if @opts['navPosition']
         switch @opts['nav']
           when 'both'
             @el.find('.container').before(nav)
             @el.find('.container').after(nav)
           when 'bot'
             @el.find('.container').after(nav)
-          else
-            @el.find('.container').before(nav)
+      else
+        @el.find('.container').before(nav)
 
-        # Pager
-        #
-        #
-        #===================
+      ### Pager
+      ###
+      if @opts['pager']
+        i = @tabs.length + 1
+        while i -= 1
+          @el.find('.nav').prepend('<li class="pager">' + i + '</li>')
 
-        # pages
-        if @opts['pager']
-          i = @tabs.length + 1
-          while i -= 1
-            @el.find('.nav').prepend('<li>' + i + '</li>')
-
-        # prev, next
+      # prev, next
+      if @opts['nav']
         @el.find('.nav').prepend('<li class="prev">prev</li>')
         @el.find('.nav').append('<li class="next">next</li>')
-        
 
       # Push el into container
       #
       #
       # ===================
-      title = @tabs.find('.title')
-      title.prependTo( @el.find('.menu') )
-
       # change to li
       title.each ->
         $(this).replaceWith '<li><span class="text">' + $(this).html() + '</span></li>'
@@ -234,6 +230,12 @@ window.dCache = {} if window.dCache == undefined
              .siblings()
              .removeClass('active')
 
+      updatePager: (el) ->
+        # @todo create similar setActive fuction for pagers
+
+      setDisable: () ->
+        # @todo set disable nav, if eq = 0 or eq = length-1
+
       # @return integer
       getLargest : (el,d) ->
         size = []
@@ -241,8 +243,6 @@ window.dCache = {} if window.dCache == undefined
           size.push $(this)[d]()
 
         return Math.max.apply(this, size)
-
-
 
 
   ### == Exports ============= ###
@@ -254,7 +254,7 @@ window.dCache = {} if window.dCache == undefined
 ### ===========================
   Jquery Plugin Interface
 ============================== ###
-(($, window)->
+(($, window) ->
   if window.plugin == undefined 
     window.plugin = {}
   pluginName                   = 'devTab'
@@ -289,7 +289,8 @@ window.dCache = {} if window.dCache == undefined
           if no effects options, use default ###
       if D.opts.fx then D.fx(D.opts.fx) else D.fx()
 
-      ### Trigger : menu ###
+      ### Trigger : menu 
+      ###
       self.on D.opts.trigger, '.menu li', ->
         if $(this).hasClass('active')
           return false
@@ -306,29 +307,44 @@ window.dCache = {} if window.dCache == undefined
             back     : diff.back
         }
 
-        # add active class
+        # add active class to menu
         D.util.setActive(this)
 
-      ### Trigger : nav ###
+      ### Trigger : nav 
+      ###
       self.on 'click', '.prev', ->
-        diff = D.util.findDiff( 2, 1 )
-        self.trigger 'paging', {
-            i: $(@).prev().index()
-            inSpeed  : if !D.opts.inSpeed then D.opts.speed
-            outSpeed : if !D.opts.outSpeed then D.opts.speed
-            diff     : diff.diff
-            back     : diff.back
-        }
+        if self.find('.active').index() != 0
+          diff = D.util.findDiff( 2, 1 )
+          self.trigger 'paging', {
+              i: self.find('.active').prev().index()
+              inSpeed  : if !D.opts.inSpeed then D.opts.speed
+              outSpeed : if !D.opts.outSpeed then D.opts.speed
+              diff     : diff.diff
+              back     : diff.back
+          }
+
+          # add active class to menu
+          D.util.setActive( self.find('.active').prev() )
+
+          # disable nav on event
+          D.util.setDisable()
 
       self.on 'click', '.next', ->
-        diff = D.util.findDiff( 1, 2 )
-        self.trigger 'paging', {
-            i: $(@).next().index()
-            inSpeed  : if !D.opts.inSpeed then D.opts.speed
-            outSpeed : if !D.opts.outSpeed then D.opts.speed
-            diff     : diff.diff
-            back     : diff.back
-        }
+        if self.find('.active').index() != self.find('.menu li').length-1
+          diff = D.util.findDiff( 1, 2 )
+          self.trigger 'paging', {
+              i: self.find('.active').next().index()
+              inSpeed  : if !D.opts.inSpeed then D.opts.speed
+              outSpeed : if !D.opts.outSpeed then D.opts.speed
+              diff     : diff.diff
+              back     : diff.back
+          }
+
+          # add active class to menu
+          D.util.setActive( self.find('.active').next() )
+
+          # disable nav on event
+          D.util.setDisable()
 
       # history
 

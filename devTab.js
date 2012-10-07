@@ -73,14 +73,22 @@ if (window.dCache === void 0) {
     dTab.prototype.build = function(obj) {
       var i, menu, nav, title;
       this.el.prepend('<div class="container" />');
+      /* Menu
+      */
+
       menu = '<ul class="menu" />';
       if (this.opts['menu']) {
         this.el.append(menu);
       } else {
         this.el.prepend(menu);
       }
+      title = this.tabs.find('.title');
+      title.prependTo(this.el.find('.menu'));
+      /* nav
+      */
+
       nav = '<ul class="nav">';
-      if (this.opts['nav']) {
+      if (this.opts['navPosition']) {
         switch (this.opts['nav']) {
           case 'both':
             this.el.find('.container').before(nav);
@@ -88,21 +96,23 @@ if (window.dCache === void 0) {
             break;
           case 'bot':
             this.el.find('.container').after(nav);
-            break;
-          default:
-            this.el.find('.container').before(nav);
         }
-        if (this.opts['pager']) {
-          i = this.tabs.length + 1;
-          while (i -= 1) {
-            this.el.find('.nav').prepend('<li>' + i + '</li>');
-          }
+      } else {
+        this.el.find('.container').before(nav);
+      }
+      /* Pager
+      */
+
+      if (this.opts['pager']) {
+        i = this.tabs.length + 1;
+        while (i -= 1) {
+          this.el.find('.nav').prepend('<li class="pager">' + i + '</li>');
         }
+      }
+      if (this.opts['nav']) {
         this.el.find('.nav').prepend('<li class="prev">prev</li>');
         this.el.find('.nav').append('<li class="next">next</li>');
       }
-      title = this.tabs.find('.title');
-      title.prependTo(this.el.find('.menu'));
       title.each(function() {
         return $(this).replaceWith('<li><span class="text">' + $(this).html() + '</span></li>');
       });
@@ -196,6 +206,8 @@ if (window.dCache === void 0) {
       setActive: function(el) {
         return $(el).addClass('active').siblings().removeClass('active');
       },
+      updatePager: function(el) {},
+      setDisable: function() {},
       getLargest: function(el, d) {
         var size;
         size = [];
@@ -285,25 +297,33 @@ if (window.dCache === void 0) {
 
       self.on('click', '.prev', function() {
         var diff;
-        diff = D.util.findDiff(2, 1);
-        return self.trigger('paging', {
-          i: $(this).prev().index(),
-          inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
-          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
-          diff: diff.diff,
-          back: diff.back
-        });
+        if (self.find('.active').index() !== 0) {
+          diff = D.util.findDiff(2, 1);
+          self.trigger('paging', {
+            i: self.find('.active').prev().index(),
+            inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
+            outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
+            diff: diff.diff,
+            back: diff.back
+          });
+          D.util.setActive(self.find('.active').prev());
+          return D.util.setDisable();
+        }
       });
       return self.on('click', '.next', function() {
         var diff;
-        diff = D.util.findDiff(1, 2);
-        return self.trigger('paging', {
-          i: $(this).next().index(),
-          inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
-          outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
-          diff: diff.diff,
-          back: diff.back
-        });
+        if (self.find('.active').index() !== self.find('.menu li').length - 1) {
+          diff = D.util.findDiff(1, 2);
+          self.trigger('paging', {
+            i: self.find('.active').next().index(),
+            inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
+            outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
+            diff: diff.diff,
+            back: diff.back
+          });
+          D.util.setActive(self.find('.active').next());
+          return D.util.setDisable();
+        }
       });
     });
   };

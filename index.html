@@ -11,6 +11,18 @@
           margin-bottom: 50px;
       }
       
+      .dtab .menu {
+          border: 1px solid green
+      }
+      
+      .dtab .active {
+          color: orange
+      }
+      
+      .dtab .disable {
+          border: 1px solid grey
+      }
+      
     </style>
   </head>
   <body>
@@ -72,8 +84,8 @@
       </div>
     </div>
     <section style="margin:10px; border: 2px solid #ddd">
-      <h4>fade, lock, bot</h4>
-      <div id="fadeNlock" data-fx="fade" data-lock="true" data-menu="bot" class="dtab">
+      <h4>fade, lock, bot, nav</h4>
+      <div id="fadeNlock" data-fx="fade" data-lock="true" data-menu="bot" data-nav="true" class="dtab">
         <div class="tab">
           <div class="title">title two</div>
           <div class="content">this is just some short one</div>
