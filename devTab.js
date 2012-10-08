@@ -134,7 +134,9 @@ if (window.dCache === void 0) {
           display: 'none'
         });
       }
-      return this.el.find('.menu').children().first().addClass('active');
+      this.el.find('.menu').children().first().addClass('active');
+      this.el.find('.pager').first().addClass('active');
+      return this.el.find('.prev').addClass('disable');
     };
 
     /* FX
@@ -206,7 +208,6 @@ if (window.dCache === void 0) {
       setActive: function(el) {
         return $(el).addClass('active').siblings().removeClass('active');
       },
-      updatePager: function(el) {},
       setDisable: function() {},
       getLargest: function(el, d) {
         var size;
@@ -282,7 +283,7 @@ if (window.dCache === void 0) {
         if ($(this).hasClass('active')) {
           return false;
         }
-        diff = D.util.findDiff(self.find('.active').index(), $(this).index());
+        diff = D.util.findDiff(self.find('.menu .active').index(), $(this).index());
         self.trigger('paging', {
           i: $(this).index(),
           inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
@@ -290,40 +291,36 @@ if (window.dCache === void 0) {
           diff: diff.diff,
           back: diff.back
         });
-        return D.util.setActive(this);
+        D.util.setActive(this);
+        D.util.setActive(self.find('.pager').eq($(this).index()));
+        if (self.find('.menu .active').index() === 0) {
+          self.find('.next, .prev').removeClass('disable');
+          return self.find('.prev').addClass('disable');
+        } else if (self.find('.menu .active').index() === self.find('.menu li').length - 1) {
+          self.find('.next, .prev').removeClass('disable');
+          return self.find('.next').addClass('disable');
+        } else {
+          return self.find('.next, .prev').removeClass('disable');
+        }
       });
       /* Trigger : nav
       */
 
       self.on('click', '.prev', function() {
-        var diff;
-        if (self.find('.active').index() !== 0) {
-          diff = D.util.findDiff(2, 1);
-          self.trigger('paging', {
-            i: self.find('.active').prev().index(),
-            inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
-            outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
-            diff: diff.diff,
-            back: diff.back
-          });
-          D.util.setActive(self.find('.active').prev());
-          return D.util.setDisable();
+        if (self.find('.menu .active').index() !== 0) {
+          return self.find('.menu .active').prev().trigger('click');
         }
       });
-      return self.on('click', '.next', function() {
-        var diff;
-        if (self.find('.active').index() !== self.find('.menu li').length - 1) {
-          diff = D.util.findDiff(1, 2);
-          self.trigger('paging', {
-            i: self.find('.active').next().index(),
-            inSpeed: !D.opts.inSpeed ? D.opts.speed : void 0,
-            outSpeed: !D.opts.outSpeed ? D.opts.speed : void 0,
-            diff: diff.diff,
-            back: diff.back
-          });
-          D.util.setActive(self.find('.active').next());
-          return D.util.setDisable();
+      self.on('click', '.next', function() {
+        if (self.find('.menu .active').index() !== self.find('.menu li').length - 1) {
+          return self.find('.menu .active').next().trigger('click');
         }
+      });
+      /* Trigger: pager
+      */
+
+      return self.on('click', '.pager', function() {
+        return self.find('.menu li').eq($(this).index() - 1).trigger('click');
       });
     });
   };

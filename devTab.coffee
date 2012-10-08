@@ -154,6 +154,8 @@ window.dCache = {} if window.dCache == undefined
       #
       # ===================
       @el.find('.menu').children().first().addClass('active')
+      @el.find('.pager').first().addClass('active')
+      @el.find('.prev').addClass('disable')
 
 
 
@@ -230,9 +232,6 @@ window.dCache = {} if window.dCache == undefined
              .siblings()
              .removeClass('active')
 
-      updatePager: (el) ->
-        # @todo create similar setActive fuction for pagers
-
       setDisable: () ->
         # @todo set disable nav, if eq = 0 or eq = length-1
 
@@ -296,7 +295,7 @@ window.dCache = {} if window.dCache == undefined
           return false
 
         # find index differnce and direction
-        diff = D.util.findDiff( self.find('.active').index(), $(@).index() )
+        diff = D.util.findDiff( self.find('.menu .active').index(), $(@).index() )
         
         # trigger effects
         self.trigger 'paging', {
@@ -310,41 +309,34 @@ window.dCache = {} if window.dCache == undefined
         # add active class to menu
         D.util.setActive(this)
 
+        # pager
+        D.util.setActive( self.find('.pager').eq( $(@).index() ) )
+
+        # disable
+        if self.find('.menu .active').index() == 0
+          self.find('.next, .prev').removeClass('disable')
+          self.find('.prev').addClass('disable')
+        else if self.find('.menu .active').index() == self.find('.menu li').length-1
+          self.find('.next, .prev').removeClass('disable')
+          self.find('.next').addClass('disable')
+        else
+          self.find('.next, .prev').removeClass('disable')
+
+
       ### Trigger : nav 
       ###
       self.on 'click', '.prev', ->
-        if self.find('.active').index() != 0
-          diff = D.util.findDiff( 2, 1 )
-          self.trigger 'paging', {
-              i: self.find('.active').prev().index()
-              inSpeed  : if !D.opts.inSpeed then D.opts.speed
-              outSpeed : if !D.opts.outSpeed then D.opts.speed
-              diff     : diff.diff
-              back     : diff.back
-          }
-
-          # add active class to menu
-          D.util.setActive( self.find('.active').prev() )
-
-          # disable nav on event
-          D.util.setDisable()
+        if self.find('.menu .active').index() != 0
+          self.find('.menu .active').prev().trigger('click')
 
       self.on 'click', '.next', ->
-        if self.find('.active').index() != self.find('.menu li').length-1
-          diff = D.util.findDiff( 1, 2 )
-          self.trigger 'paging', {
-              i: self.find('.active').next().index()
-              inSpeed  : if !D.opts.inSpeed then D.opts.speed
-              outSpeed : if !D.opts.outSpeed then D.opts.speed
-              diff     : diff.diff
-              back     : diff.back
-          }
+        if self.find('.menu .active').index() != self.find('.menu li').length-1
+          self.find('.menu .active').next().trigger('click')
 
-          # add active class to menu
-          D.util.setActive( self.find('.active').next() )
-
-          # disable nav on event
-          D.util.setDisable()
+      ### Trigger: pager
+      ###
+      self.on 'click', '.pager', ->
+        self.find('.menu li').eq( $(this).index()-1 ).trigger 'click'
 
       # history
 
